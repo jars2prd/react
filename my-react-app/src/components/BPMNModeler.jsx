@@ -1,56 +1,63 @@
 import React, { useEffect, useRef } from "react";
 import BpmnModeler from "bpmn-js/lib/Modeler";
+import "bpmn-js/dist/assets/diagram-js.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 
-export default function BPMNModeler({ onChange }) {
+export default function BPMNModeler({ xml, onChange }) {
   const containerRef = useRef(null);
   const modelerRef = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Initialize BPMN Modeler
     modelerRef.current = new BpmnModeler({
       container: containerRef.current,
-      width: "100%",
-      height: "100%"
+      keyboard: { bindTo: document },
     });
 
-    // ✅ Use async init to avoid rendering before ready
-    async function createNewDiagram() {
+    async function loadDiagram() {
       try {
-        await modelerRef.current.createDiagram();
+        if (xml) {
+          // 🟢 Load predefined BPMN XML
+          await modelerRef.current.importXML(xml);
+        } else {
+          // 🟡 Create a blank diagram if none provided
+          await modelerRef.current.createDiagram();
+        }
+
+        // 🧭 Fit diagram to viewport
         const canvas = modelerRef.current.get("canvas");
         canvas.zoom("fit-viewport");
       } catch (err) {
-        console.error("Error creating BPMN diagram:", err);
+        console.error("Error loading BPMN diagram:", err);
       }
     }
 
-    createNewDiagram();
+    loadDiagram();
 
-    // Listen for model changes
+    // Listen for changes (optional)
     if (onChange) {
       modelerRef.current.on("commandStack.changed", async () => {
-        try {
-          const { xml } = await modelerRef.current.saveXML({ format: true });
-          onChange(xml);
-        } catch (e) {
-          console.error(e);
-        }
+        const { xml } = await modelerRef.current.saveXML({ format: true });
+        onChange(xml);
       });
     }
 
-    return () => modelerRef.current?.destroy();
-  }, [onChange]);
+    // Cleanup
+    return () => modelerRef.current.destroy();
+  }, [xml, onChange]);
 
   return (
     <div
       ref={containerRef}
       style={{
         width: "100%",
-        height: "80vh",
-        minHeight: "500px",
+        height: "85vh",
         border: "1px solid #ccc",
-        borderRadius: "8px"
+        borderRadius: "8px",
+        overflow: "hidden",
       }}
     />
   );

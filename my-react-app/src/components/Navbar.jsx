@@ -11,11 +11,11 @@ export default function Navbar() {
           <NavLink to="/card-dispute" className={({isActive}) => isActive ? 'active' : ''}>
             Card Dispute
           </NavLink>
-          <NavLink to="/dispute-decision" className={({isActive}) => isActive ? 'active' : ''}>
+          {/* <NavLink to="/dispute-decision" className={({isActive}) => isActive ? 'active' : ''}>
             Dispute Decision
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/workflow-designer" className={({isActive}) => isActive ? 'active' : ''}>
-            Workflow Designer
+            Camunda Workflow 
           </NavLink>
         </div>
       </div>

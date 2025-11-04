@@ -47,12 +47,16 @@ export default function TransactionTable({ transactions = [], onView, onDispute 
                   </span>
                 </td>
                 <td style={tdStyle}>
-                  <button onClick={() => onView?.(txn)} style={btnStyle}>
+                  {txn.status === "" ? <button onClick={underDevelopment} style={btnStyle}>
                     WriteOff
-                  </button>
-                  <button onClick={() => onDispute?.(txn)} style={btnStyleAlt}>
+                  </button>: <button onClick={underDevelopment} style={btnStyle}>
+                    View Dispute
+                  </button>}
+                  
+                  {txn.status === "" ? <button onClick={() => onDispute?.(txn)} style={btnStyleAlt}>
                     Dispute
-                  </button>
+                  </button>: ""}
+                  
                 </td>
               </tr>
             ))
@@ -68,6 +72,10 @@ export default function TransactionTable({ transactions = [], onView, onDispute 
     </div>
   );
 }
+
+const underDevelopment = () => {
+    alert("✅ Page is under development!");    
+  };
 
 const thStyle = {
   textAlign: "left",
